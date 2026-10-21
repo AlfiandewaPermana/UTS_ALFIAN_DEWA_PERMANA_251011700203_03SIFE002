@@ -7,9 +7,16 @@ use Illuminate\Http\Request;
 
 class DigitalArtController extends Controller
 {
-    public function index()
+   public function index(Request $request)
     {
-        $arts = DigitalArt::all();
+        $search = $request->input('search');
+
+        $arts = DigitalArt::when($search, function ($query, $search) {
+            return $query->where('title', 'like', "%{$search}%")
+                         ->orWhere('artist', 'like', "%{$search}%")
+                         ->orWhere('software_used', 'like', "%{$search}%");
+        })->get();
+
         return view('arts.index', compact('arts'));
     }
 
